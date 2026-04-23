@@ -11,17 +11,23 @@ export default class AddTodo {
   }
 
   onClick(callback) {
-    this.btn.onclick = () => {
-      if (this.title.value === '' || this.description.value === '') {
-        this.alert.show('Title and description are required');
-      } else {
-        this.alert.hide();
-        callback(this.title.value, this.description.value, this.dueDate.value);
+    if (this.btn) {
+      this.btn.onclick = () => {
+        if (this.title.value === '') {
+          this.alert.show('El título es obligatorio para crear la tarea');
+        } else {
+          this.alert.hide();
+          callback(
+            this.title.value, 
+            this.description.value, 
+            this.dueDate.value
+          );
 
-        this.title.value = '';
-        this.description.value = '';
-        this.dueDate.value = '';
-      }
+          this.title.value = '';
+          this.description.value = '';
+          this.dueDate.value = '';
+        }
+      };
     }
   }
 }

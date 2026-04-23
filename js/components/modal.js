@@ -1,40 +1,61 @@
-import Alert from './alert.js';
-
 export default class Modal {
-  constructor() {
-    this.title = document.getElementById('modal-title');
-    this.description = document.getElementById('modal-description');
-    this.dueDate = document.getElementById('modal-due-date'); // Capturamos la fecha del modal
-    this.btn = document.getElementById('modal-btn');
-    this.completed = document.getElementById('modal-completed');
-    this.alert = new Alert('modal-alert');
-
-    this.todo = null;
+  constructor(model, view) {
+    this.model = model;
+    this.view = view;
+    this.currentEditId = null;
+    this.modalElement = document.getElementById('modal');
+    this.btnSave = document.getElementById('modal-btn');
+    this.titleInput = document.getElementById('modal-title');
+    this.descriptionInput = document.getElementById('modal-description');
+    this.dueDateInput = document.getElementById('modal-due-date');
+    this.completedInput = document.getElementById('modal-completed');
+    this.alertDiv = document.getElementById('modal-alert');
+    
+    this.attachEvents();
   }
 
-  setValues(todo) {
-    this.todo = todo;
-    this.title.value = todo.title;
-    this.description.value = todo.description;
-    this.dueDate.value = todo.dueDate || ''; // Asignamos la fecha (si existe)
-    this.completed.checked = todo.completed;
+  openForEdit(task) {
+    this.currentEditId = task.id;
+    this.titleInput.value = task.title;
+    this.descriptionInput.value = task.description || '';
+    this.dueDateInput.value = task.dueDate || '';
+    this.completedInput.checked = task.completed;
+    
+    if (this.alertDiv) {
+      this.alertDiv.classList.add('d-none');
+    }
+    
+    $('#modal').modal('show');
   }
 
-  onClick(callback) {
-    this.btn.onclick = () => {
-      if (!this.title.value || !this.description.value) {
-        this.alert.show('Title and description are required');
-        return;
+  saveEdit() {
+    const titleValue = this.titleInput.value.trim();
+    
+    if (!titleValue) {
+      if (this.alertDiv) {
+        this.alertDiv.innerText = 'El título es obligatorio para la actividad.';
+        this.alertDiv.classList.remove('d-none');
       }
+      return;
+    }
 
-      $('#modal').modal('toggle');
-
-      callback(this.todo.id, {
-        title: this.title.value,
-        description: this.description.value,
-        dueDate: this.dueDate.value, // Mandamos la fecha nueva
-        completed: this.completed.checked,
+    if (this.currentEditId !== null) {
+      this.model.editTodo(this.currentEditId, {
+        title: titleValue,
+        description: this.descriptionInput.value,
+        dueDate: this.dueDateInput.value,
+        completed: this.completedInput.checked
       });
+      
+      $('#modal').modal('hide');
+      this.view.renderCards(this.model.getFilteredAndSearchedTodos());
+      this.currentEditId = null;
+    }
+  }
+
+  attachEvents() {
+    if (this.btnSave) {
+      this.btnSave.addEventListener('click', () => this.saveEdit());
     }
   }
 }
