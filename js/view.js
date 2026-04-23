@@ -9,9 +9,8 @@ export default class View {
     this.addTodoForm = new AddTodo();
     this.modal = new Modal();
     this.filters = new Filters();
-    
 
-    this.addTodoForm.onClick((title, description) => this.addTodo(title, description));
+    this.addTodoForm.onClick((title, description, dueDate) => this.addTodo(title, description, dueDate));
     this.modal.onClick((id, values) => this.editTodo(id, values));
     this.filters.onClick((filters) => this.filter(filters));
   }
@@ -29,7 +28,7 @@ export default class View {
     const { type, words } = filters;
     const [, ...rows] = this.table.getElementsByTagName('tr');
     for (const row of rows) {
-      const [title, description, completed] = row.children;
+      const [title, description, dueDate, completed] = row.children;
       let shouldHide = false;
 
       if (words) {
@@ -51,8 +50,8 @@ export default class View {
     }
   }
 
-  addTodo(title, description) {
-    const todo = this.model.addTodo(title, description);
+  addTodo(title, description, dueDate) {
+    const todo = this.model.addTodo(title, description, dueDate);
     this.createRow(todo);
   }
 
@@ -65,7 +64,8 @@ export default class View {
     const row = document.getElementById(id);
     row.children[0].innerText = values.title;
     row.children[1].innerText = values.description;
-    row.children[2].children[0].checked = values.completed;
+    row.children[2].innerText = values.dueDate || 'Sin fecha';
+    row.children[3].children[0].checked = values.completed;
   }
 
   removeTodo(id) {
@@ -74,24 +74,21 @@ export default class View {
   }
 
   createRow(todo) {
-    const row = table.insertRow();
+    const row = this.table.insertRow();
     row.setAttribute('id', todo.id);
     row.innerHTML = `
       <td>${todo.title}</td>
       <td>${todo.description}</td>
-      <td class="text-center">
-
-      </td>
-      <td class="text-right">
-
-      </td>
+      <td class="text-muted small align-middle">${todo.dueDate || 'Sin fecha'}</td>
+      <td class="text-center align-middle"></td>
+      <td class="text-right"></td>
     `;
 
     const checkbox = document.createElement('input');
     checkbox.type = 'checkbox';
     checkbox.checked = todo.completed;
     checkbox.onclick = () => this.toggleCompleted(todo.id);
-    row.children[2].appendChild(checkbox);
+    row.children[3].appendChild(checkbox);
 
     const editBtn = document.createElement('button');
     editBtn.classList.add('btn', 'btn-primary', 'mb-1');
@@ -102,14 +99,15 @@ export default class View {
       id: todo.id,
       title: row.children[0].innerText,
       description: row.children[1].innerText,
-      completed: row.children[2].children[0].checked,
+      dueDate: todo.dueDate,
+      completed: row.children[3].children[0].checked,
     });
-    row.children[3].appendChild(editBtn);
+    row.children[4].appendChild(editBtn);
 
     const removeBtn = document.createElement('button');
     removeBtn.classList.add('btn', 'btn-danger', 'mb-1', 'ml-1');
     removeBtn.innerHTML = '<i class="fa fa-trash"></i>';
     removeBtn.onclick = () => this.removeTodo(todo.id);
-    row.children[3].appendChild(removeBtn);
+    row.children[4].appendChild(removeBtn);
   }
 }

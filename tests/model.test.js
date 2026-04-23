@@ -1,7 +1,8 @@
-import Model from '../model.js';
+import { jest } from '@jest/globals';
+import Model from '../js/model.js';
 
 beforeEach(() => {
-    global.localstorage = {
+    global.localStorage = {
         getItem: jest.fn(() => null),
         setItem: jest.fn(),
     };
@@ -9,15 +10,14 @@ beforeEach(() => {
 
 test('HU1: Agregar una tarea correctamente al modelo', () => {
     const model = new Model();
-    const initialLenght = model.getTodos().leght;
+    const initialLength = model.getTodos().length;
 
-    //Función para añadir tareas
+    // Función para añadir tareas
     const newTodo = model.addTodo('Aprender XP', 'Estudiar Pair Programming');
 
-    //criterios de aceptación
+    // Criterios de aceptación
     expect(newTodo.title).toBe('Aprender XP');
     expect(newTodo.description).toBe('Estudiar Pair Programming');
-    expect(newTodo.completed).toBe('false');
-    expect(model.getTodos().lenght).toBe(initialLenght + 1);
-
+    expect(newTodo.completed).toBe(false);
+    expect(model.getTodos().length).toBe(initialLength + 1);
 });

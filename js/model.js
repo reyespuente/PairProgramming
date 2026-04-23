@@ -46,18 +46,17 @@ export default class Model {
     this.save();
   }
 
-  addTodo(title, description) {
+  addTodo(title, description, dueDate) {
     const todo = {
       id: this.currentId++,
       title,
       description,
+      dueDate,
       completed: false,
-    }
+    };
 
     this.todos.push(todo);
-    console.log(this.todos);
     this.save();
-
     return {...todo};
   }
 

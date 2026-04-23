@@ -20,5 +20,11 @@
   "homepage": "https://github.com/reyespuente/PairProgramming#readme",
   "devDependencies": {
     "jest": "^30.3.0"
+  },
+  "dependencies": {
+    "@jest/globals": "^30.3.0"
+  },
+  "directories": {
+    "test": "tests"
   }
 }
